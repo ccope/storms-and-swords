@@ -27,7 +27,7 @@ pub struct World<'a> {
     pub entity_uids: UID,
     pub controller_uid: UID,
     pub to_content_server: Sender<EContentRequestType>,
-    pub from_cotent_server: Receiver<EContentRequestResult>,
+    pub from_content_server: Receiver<EContentRequestResult>,
     pub to_render_thread: SyncSender<RenderFrame>,
     pub from_render_thread_for_input: Receiver<glutin::KeyboardInput>,
     pub test: i32,
@@ -41,7 +41,7 @@ pub struct World<'a> {
 impl<'a> World<'a> {
     pub fn new(
         to_content_server: Sender<EContentRequestType>,
-        from_cotent_server: Receiver<EContentRequestResult>,
+        from_content_server: Receiver<EContentRequestResult>,
         to_render_thread: SyncSender<RenderFrame>,
         from_render_thread_for_input: Receiver<glutin::KeyboardInput>,
     ) -> World<'a> {
@@ -50,7 +50,7 @@ impl<'a> World<'a> {
             entity_uids: 1 as u64, //uids start at 1, because we can use 0 as a flag value, a NULL valye
             controller_uid: 1 as u64,
             to_content_server: to_content_server,
-            from_cotent_server: from_cotent_server,
+            from_content_server: from_content_server,
             to_render_thread: to_render_thread,
             from_render_thread_for_input: from_render_thread_for_input,
             test: 0 as i32,
@@ -63,14 +63,14 @@ impl<'a> World<'a> {
 
     pub fn update(
         to_content_server: Sender<EContentRequestType>,
-        from_cotent_server: Receiver<EContentRequestResult>,
+        from_content_server: Receiver<EContentRequestResult>,
         to_render_thread: SyncSender<RenderFrame>,
         from_render_thread_input: Receiver<glutin::KeyboardInput>,
     ) {
 
         let world: World = World::new(
             to_content_server,
-            from_cotent_server,
+            from_content_server,
             to_render_thread,
             from_render_thread_input,
         );
@@ -174,7 +174,7 @@ impl<'a> World<'a> {
 
     pub fn load_content(&self, content: EContentRequestType) -> Result<ContentId, ELoadContentError> {
         let _ = self.to_content_server.send(content);
-        let result = self.from_cotent_server.recv();
+        let result = self.from_content_server.recv();
         match result {
             Ok(return_content) => {
                 match return_content {
